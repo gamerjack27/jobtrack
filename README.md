@@ -12,15 +12,21 @@ JobTrack is a web-based job and internship application management platform that 
 
 ## Getting Started
 
-//Frontend
+**Frontend**
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
-//Backend
+**Backend**
+```bash
 cd backend
 npm install
 npm run dev
+```
+
+Full setup instructions (environment variables, database migrations, seed data) will be added as the MVP is built out in Milestone 1.
 
 Full setup instructions (environment variables, database migrations, seed data) will be added as the MVP is built out in Milestone 1.
 
