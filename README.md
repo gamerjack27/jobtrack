@@ -41,9 +41,6 @@ Full setup instructions (environment variables, database migrations, seed data) 
 
 Prioritized user stories for the MVP, in build order.
 
-
-## Backlog
-
 1. Explorer-style application list
 2. Secure account authentication
 3. CRUD for job applications
@@ -53,7 +50,3 @@ Prioritized user stories for the MVP, in build order.
 7. Analytics dashboard (post-MVP)
 8. Google Calendar integration (post-MVP)
 9. Custom tags/categories (post-MVP)
-
-## Status
-
-🚧 Milestone 0 — project proposed, repository initialized.
