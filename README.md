@@ -28,8 +28,6 @@ npm run dev
 
 Full setup instructions (environment variables, database migrations, seed data) will be added as the MVP is built out in Milestone 1.
 
-Full setup instructions (environment variables, database migrations, seed data) will be added as the MVP is built out in Milestone 1.
-
 ## Team
 
 - Jackson Lammons: Frontend, UI/UX & Security
