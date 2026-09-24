@@ -4,7 +4,7 @@ JobTrack is a web-based job and internship application management platform that 
 
 ## Tech Stack
 
-- **Frontend:** React (Vite), Tailwind CSS, Lucide Icons, TanStack Table
+- **Frontend:** React (Vite), Tailwind CSS, Lucide Icons, TanStack Table v8
 - **Backend:** Node.js, Express.js (REST API)
 - **Database:** PostgreSQL
 - **Testing:** Jest/Supertest (backend), React Testing Library (frontend)

@@ -1,0 +1,48 @@
+// Fake data to build the table against until James's API is ready
+export const mockApplications = [
+  {
+    id: 1,
+    company: "Google",
+    role: "Software Engineering Intern",
+    status: "Interviewing",
+    appliedDate: "2026-08-15",
+    salary: 8500,
+    location: "Mountain View, CA",
+  },
+  {
+    id: 2,
+    company: "Regions Bank",
+    role: "Backend Developer",
+    status: "Applied",
+    appliedDate: "2026-08-20",
+    salary: 75000,
+    location: "Birmingham, AL",
+  },
+  {
+    id: 3,
+    company: "Shipt",
+    role: "Full Stack Engineer Intern",
+    status: "Offer",
+    appliedDate: "2026-08-10",
+    salary: 9000,
+    location: "Birmingham, AL",
+  },
+  {
+    id: 4,
+    company: "Microsoft",
+    role: "Product Manager",
+    status: "Rejected",
+    appliedDate: "2026-08-05",
+    salary: 95000,
+    location: "Redmond, WA",
+  },
+  {
+    id: 5,
+    company: "Airbnb",
+    role: "Frontend Engineer Intern",
+    status: "Bookmarked",
+    appliedDate: "2026-08-22",
+    salary: 8000,
+    location: "Remote",
+  },
+];
