@@ -24,6 +24,13 @@ function App() {
   setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
   setView("app");
 };
+  // no async or params needed, just clears the session and goes back to login
+  const handleLogout = () => {
+  setUser(null);
+  setTokens(null);
+  setView("login");
+};
+
 
   const handleRegister = async (formData) => {
   const res = await fetch("/api/auth/register", {
@@ -60,11 +67,22 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <h1 className="text-2xl font-bold px-6 pt-6">JobTrack</h1>
-      <ApplicationTable />
+  <div className="min-h-screen bg-white">
+    <div className="flex justify-between items-center px-6 pt-6">
+      <h1 className="text-2xl font-bold">JobTrack</h1>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-gray-600">Welcome, {user?.displayName}</span>
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1.5 text-sm rounded border border-gray-300 hover:bg-gray-50"
+        >
+          Log out
+        </button>
+      </div>
     </div>
-  );
+    <ApplicationTable />
+  </div>
+);
 }
 
 export default App;
