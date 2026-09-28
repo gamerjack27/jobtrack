@@ -6,18 +6,40 @@ import RegisterForm from "./components/RegisterForm";
 function App() {
   // "login" | "register" | "app" - simple manual routing until we add React Router
   const [view, setView] = useState("login");
+  const [user, setUser] = useState(null);
+  const [tokens, setTokens] = useState(null);
 
-  const handleLogin = (formData) => {
-    console.log("Login submitted:", formData);
-    // later: call James's /api/login endpoint here, store the JWT, then:
-    setView("app");
-  };
+  const handleLogin = async (formData) => {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  });
+  const data = await res.json();
 
-  const handleRegister = (formData) => {
-    console.log("Register submitted:", formData);
-    // later: call James's /api/register endpoint here
-    setView("app");
-  };
+  // fetch doesn't throw on a 400, so check it ourselves
+  if (!res.ok) throw new Error(data.error.message);
+
+  setUser(data.user);
+  setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+  setView("app");
+};
+
+  const handleRegister = async (formData) => {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  });
+  const data = await res.json();
+
+  // fetch doesn't throw on a 400, so check it ourselves
+  if (!res.ok) throw new Error(data.error.message);
+
+  setUser(data.user);
+  setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+  setView("app");
+};
 
   if (view === "login") {
     return (

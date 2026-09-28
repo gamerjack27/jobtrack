@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function RegisterForm({ onSubmit, onSwitchToLogin }) {
   const [formData, setFormData] = useState({
+    displayName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -13,23 +14,36 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (!formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Please fill in all fields.");
-      return;
-    }
+  if (!formData.email || !formData.displayName || !formData.password || !formData.confirmPassword) {
+    setError("Please fill in all fields.");
+    return;
+  }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+  // James's backend rejects anything under 8, so catch it here first
+  if (formData.password.length < 8) {
+    setError("Password must be at least 8 characters.");
+    return;
+  }
 
-    // only send email/password to the backend later, not confirmPassword
-    onSubmit({ email: formData.email, password: formData.password });
-  };
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
+
+  try {
+    await onSubmit({
+      email: formData.email,
+      displayName: formData.displayName,
+      password: formData.password,
+    });
+  } catch (err) {
+    setError(err.message); // shows the backend's message, like "This email is already registered."
+  }
+};
 
   return (
     <div
@@ -43,8 +57,18 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
         {error && (
           <p className="text-sm text-red-600 mb-3">{error}</p>
         )}
-
+        
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Display Name</label>
+            <input
+              type="text"
+              name="displayName"
+              value={formData.displayName}
+              onChange={handleChange}
+              className="mt-1 w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+            />
+        </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input

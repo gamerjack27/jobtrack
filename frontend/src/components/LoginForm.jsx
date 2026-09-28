@@ -9,18 +9,21 @@ function LoginForm({ onSubmit, onSwitchToRegister }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    // placeholder validation until James's auth endpoint exists
-    if (!formData.email || !formData.password) {
-      setError("Please fill in both fields.");
-      return;
-    }
+  if (!formData.email || !formData.password) {
+    setError("Please fill in both fields.");
+    return;
+  }
 
-    onSubmit(formData);
-  };
+  try {
+    await onSubmit(formData);
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   return (
     <div
