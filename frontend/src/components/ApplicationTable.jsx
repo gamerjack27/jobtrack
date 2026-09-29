@@ -39,12 +39,29 @@ function ApplicationTable({ accessToken }) {
   fetchApplications();
 }, [accessToken]);
 
-  const handleStatusChange = (id, newStatus) => {
-    setData((prevData) =>
-      prevData.map((app) =>
-        app.id === id ? { ...app, status: newStatus } : app
-      )
-    );
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const res = await fetch(`/api/applications/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const updated = await res.json();
+
+      if (!res.ok) {
+        alert(updated.error?.message || "Failed to update status.");
+        return;
+      }
+
+      setData((prevData) =>
+        prevData.map((app) => (app.id === id ? updated : app))
+      );
+    } catch (err) {
+      alert("Something went wrong reaching the server.");
+    }
   };
 
   const openAddModal = () => {
