@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect} from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -7,18 +7,37 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import { ArrowUpDown, Plus } from "lucide-react";
-import { mockApplications } from "../data/mockApplications";
 import Modal from "./Modal";
 import ApplicationForm from "./ApplicationForm";
 
-function ApplicationTable() {
-  const [data, setData] = useState(mockApplications);
+function ApplicationTable({ accessToken }) {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState([true]);
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
   // modal state - tracks whether it's open, and which row (if any) we're editing
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
+  useEffect(() => {
+  const fetchApplications = async () => {
+    const res = await fetch("/api/applications", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error(result.error?.message || "Failed to load applications");
+      setIsLoading(false);
+      return;
+    }
+
+    setData(result);
+    setIsLoading(false);
+  };
+
+  fetchApplications();
+}, [accessToken]);
 
   const handleStatusChange = (id, newStatus) => {
     setData((prevData) =>
@@ -43,26 +62,46 @@ function ApplicationTable() {
     setEditingRow(null);
   };
 
-  const handleFormSubmit = (formData) => {
-    if (editingRow) {
-      // editing an existing row - match by id, replace its data
-      setData((prevData) =>
-        prevData.map((app) =>
-          app.id === editingRow.id ? { ...formData, id: editingRow.id } : app
-        )
-      );
-    } else {
-      // adding a new row - generate a simple id off the current max
-      const newId = Math.max(...data.map((app) => app.id), 0) + 1;
-      setData((prevData) => [...prevData, { ...formData, id: newId }]);
+  const handleFormSubmit = async (formData) => {
+    const isEditing = Boolean(editingRow);
+    const url = isEditing ? `/api/applications/${editingRow.id}` : "/api/applications";
+    const method = isEditing ? "PATCH" : "POST";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.error?.message || `Failed to ${isEditing ? "update" : "create"} application.`);
+        return;
+      }
+
+      if (isEditing) {
+        setData((prevData) =>
+          prevData.map((app) => (app.id === editingRow.id ? result : app))
+        );
+      } else {
+        setData((prevData) => [...prevData, result]);
+      }
+    }  catch (err) {
+      alert("Something went wrong reaching the server.");
+      return;
     }
+
     closeModal();
   };
 
   const columns = useMemo(
     () => [
       { accessorKey: "company", header: "Company" },
-      { accessorKey: "role", header: "Role" },
+      { accessorKey: "jobTitle", header: "Role" },
       {
         accessorKey: "status",
         header: "Status",
@@ -75,20 +114,32 @@ function ApplicationTable() {
               onClick={(e) => e.stopPropagation()}
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
-              <option value="Bookmarked">Bookmarked</option>
-              <option value="Applied">Applied</option>
-              <option value="Interviewing">Interviewing</option>
-              <option value="Offer">Offer</option>
-              <option value="Rejected">Rejected</option>
+              <option value="WISHLIST">Bookmarked</option>
+              <option value="APPLIED">Applied</option>
+              <option value="INTERVIEWING">Interviewing</option>
+              <option value="OFFERED">Offer</option>
+              <option value="REJECTED">Rejected</option>
             </select>
           );
         },
       },
-      { accessorKey: "appliedDate", header: "Applied Date" },
+      {
+        accessorKey: "appliedDate",
+        header: "Applied Date",
+        cell: (info) => {
+          const value = info.getValue();
+          return value ? new Date(value).toLocaleDateString() : "";
+        },
+      },
       {
         accessorKey: "salary",
         header: "Salary",
-        cell: (info) => `$${info.getValue().toLocaleString()}`,
+        cell: (info) => {
+          const value = info.getValue();
+          const num = Number(value);
+          // if it's a real number, format it with commas; otherwise just show whatever's there
+          return !isNaN(num) && value !== "" ? `$${num.toLocaleString()}` : value;
+        },
       },
       { accessorKey: "location", header: "Location" },
     ],
@@ -105,6 +156,10 @@ function ApplicationTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  if (isLoading) {
+    return <p className="p-6 text-gray-500">Loading applications...</p>;
+  }
 
   return (
     <div className="p-6">

@@ -1,10 +1,9 @@
-// Fake data to build the table against until James's API is ready
 export const mockApplications = [
   {
     id: 1,
     company: "Google",
-    role: "Software Engineering Intern",
-    status: "Interviewing",
+    jobTitle: "Software Engineering Intern",
+    status: "INTERVIEWING",
     appliedDate: "2026-08-15",
     salary: 8500,
     location: "Mountain View, CA",
@@ -12,8 +11,8 @@ export const mockApplications = [
   {
     id: 2,
     company: "Regions Bank",
-    role: "Backend Developer",
-    status: "Applied",
+    jobTitle: "Backend Developer",
+    status: "APPLIED",
     appliedDate: "2026-08-20",
     salary: 75000,
     location: "Birmingham, AL",
@@ -21,8 +20,8 @@ export const mockApplications = [
   {
     id: 3,
     company: "Shipt",
-    role: "Full Stack Engineer Intern",
-    status: "Offer",
+    jobTitle: "Full Stack Engineer Intern",
+    status: "OFFERED",
     appliedDate: "2026-08-10",
     salary: 9000,
     location: "Birmingham, AL",
@@ -30,8 +29,8 @@ export const mockApplications = [
   {
     id: 4,
     company: "Microsoft",
-    role: "Product Manager",
-    status: "Rejected",
+    jobTitle: "Product Manager",
+    status: "REJECTED",
     appliedDate: "2026-08-05",
     salary: 95000,
     location: "Redmond, WA",
@@ -39,8 +38,8 @@ export const mockApplications = [
   {
     id: 5,
     company: "Airbnb",
-    role: "Frontend Engineer Intern",
-    status: "Bookmarked",
+    jobTitle: "Frontend Engineer Intern",
+    status: "WISHLIST",
     appliedDate: "2026-08-22",
     salary: 8000,
     location: "Remote",

@@ -80,7 +80,7 @@ function App() {
         </button>
       </div>
     </div>
-    <ApplicationTable />
+    <ApplicationTable accessToken={tokens.accessToken} />
   </div>
 );
 }

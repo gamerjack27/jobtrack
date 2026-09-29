@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 
 const emptyForm = {
   company: "",
-  role: "",
-  status: "Bookmarked",
+  jobTitle: "",
+  status: "WISHLIST",
   appliedDate: "",
   salary: "",
   location: "",
@@ -15,7 +15,15 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
   // if we're editing an existing row, pre-fill the form with its data
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        company: initialData.company || "",
+        jobTitle: initialData.jobTitle || "",
+        status: initialData.status || "WISHLIST",
+        // the date input needs YYYY-MM-DD, but the server sends a full timestamp
+        appliedDate: initialData.appliedDate ? initialData.appliedDate.slice(0, 10) : "",
+        salary: initialData.salary || "",
+        location: initialData.location || "",
+      });
     } else {
       setFormData(emptyForm);
     }
@@ -27,9 +35,15 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+  e.preventDefault();
+  onSubmit({
+    ...formData,
+    // the date input gives back YYYY-MM-DD, but the server needs a full ISO timestamp
+    appliedDate: formData.appliedDate
+      ? new Date(formData.appliedDate).toISOString()
+      : undefined,
+  });
+};
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -47,8 +61,8 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       <div>
         <label className="block text-sm font-medium text-gray-700">Role</label>
         <input
-          name="role"
-          value={formData.role}
+          name="jobTitle"
+          value={formData.jobTitle}
           onChange={handleChange}
           required
           className="mt-1 w-full border border-gray-300 rounded px-2 py-1 text-sm"
@@ -63,11 +77,11 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
           onChange={handleChange}
           className="mt-1 w-full border border-gray-300 rounded px-2 py-1 text-sm"
         >
-          <option value="Bookmarked">Bookmarked</option>
-          <option value="Applied">Applied</option>
-          <option value="Interviewing">Interviewing</option>
-          <option value="Offer">Offer</option>
-          <option value="Rejected">Rejected</option>
+          <option value="WISHLIST">Bookmarked</option>
+          <option value="APPLIED">Applied</option>
+          <option value="INTERVIEWING">Interviewing</option>
+          <option value="OFFERED">Offer</option>
+          <option value="REJECTED">Rejected</option>
         </select>
       </div>
 
