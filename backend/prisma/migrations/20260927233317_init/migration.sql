@@ -23,7 +23,7 @@ CREATE TABLE "Application" (
     "status" "ApplicationStatus" NOT NULL DEFAULT 'WISHLIST',
     "location" TEXT,
     "salary" TEXT,
-    "appliedDate" TIMESTAMP(3),
+    "appliedDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

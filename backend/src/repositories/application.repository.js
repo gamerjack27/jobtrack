@@ -1,9 +1,9 @@
 import { prisma } from "../db/client.js";
 
 export const ApplicationRepository = {
-  create({ userId, company, jobTitle, location, salary, status, notes }) {
+  create({ userId, company, jobTitle, location, salary, appliedDate, status, notes }) {
     return prisma.application.create({
-      data: { userId, company, jobTitle, location, salary, status, notes }
+      data: { userId, company, jobTitle, location, salary, appliedDate, status, notes }
     });
   },
 

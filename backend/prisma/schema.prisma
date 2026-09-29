@@ -34,7 +34,7 @@ model Application {
     status      ApplicationStatus @default(WISHLIST)
     location    String?
     salary      String?
-    appliedDate DateTime?        @default(now())
+    appliedDate DateTime        @default(now())
     notes       String?
     createdAt   DateTime          @default(now())
     updatedAt   DateTime          @updatedAt
