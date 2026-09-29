@@ -6,7 +6,7 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Plus } from "lucide-react";
+import { ArrowUpDown, Plus, Trash2 } from "lucide-react";
 import Modal from "./Modal";
 import ApplicationForm from "./ApplicationForm";
 
@@ -63,7 +63,28 @@ function ApplicationTable({ accessToken }) {
       alert("Something went wrong reaching the server.");
     }
   };
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this application?")) return;
 
+    try {
+      const res = await fetch(`/api/applications/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!res.ok) {
+        const result = await res.json();
+        alert(result.error?.message || "Failed to delete application.");
+        return;
+      }
+
+      // his DELETE returns 204 No Content on success - no body to parse,
+      // so we just remove it locally instead of reading a response
+      setData((prevData) => prevData.filter((app) => app.id !== id));
+    } catch (err) {
+      alert("Something went wrong reaching the server.");
+    }
+  };
   const openAddModal = () => {
     setEditingRow(null);
     setIsModalOpen(true);
@@ -159,6 +180,24 @@ function ApplicationTable({ accessToken }) {
         },
       },
       { accessorKey: "location", header: "Location" },
+      {
+        id: "actions",
+        header: "",
+        cell: (info) => {
+          const row = info.row.original;
+          return (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(row.id);
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              <Trash2 size={16} />
+            </button>
+          );
+        },
+      },
     ],
     []
   );
@@ -204,12 +243,14 @@ function ApplicationTable({ accessToken }) {
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  onClick={header.column.getToggleSortingHandler()}
+                  onClick={header.column.columnDef.header ? header.column.getToggleSortingHandler() : undefined}
                   className="px-4 py-2 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-1">
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                    <ArrowUpDown size={14} className="text-gray-400" />
+                    {header.column.columnDef.header && (
+                      <ArrowUpDown size={14} className="text-gray-400" />
+                    )}
                   </div>
                 </th>
               ))}
