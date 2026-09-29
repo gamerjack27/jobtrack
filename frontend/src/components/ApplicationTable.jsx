@@ -157,7 +157,7 @@ function ApplicationTable({ accessToken }) {
               <option value="INTERVIEWING">Interviewing</option>
               <option value="OFFERED">Offer</option>
               <option value="REJECTED">Rejected</option>
-            </select>
+            </select> 
           );
         },
       },
@@ -166,7 +166,7 @@ function ApplicationTable({ accessToken }) {
         header: "Applied Date",
         cell: (info) => {
           const value = info.getValue();
-          return value ? new Date(value).toLocaleDateString() : "";
+          return value ? new Date(value).toLocaleDateString(undefined, { timeZone: "UTC" }) : "";
         },
       },
       {
