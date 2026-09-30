@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || "dev-access-secret";
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "dev-refresh-secret";
-const ACCESS_TOKEN_TTL = "15m";
+const ACCESS_TOKEN_TTL = "8h"; // TODO: Complete the refresh token implementation
 const REFRESH_TOKEN_TTL = "7d";
 
 export class InvalidTokenError extends Error {}
