@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect} from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -38,7 +38,7 @@ function ApplicationTable({ authFetch }) {
   fetchApplications();
 }, [authFetch]);
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = useCallback(async (id, newStatus) => {
     try {
       const res = await authFetch(`/api/applications/${id}`, {
         method: "PATCH",
@@ -60,8 +60,8 @@ function ApplicationTable({ authFetch }) {
     } catch {
       alert("Something went wrong reaching the server.");
     }
-  };
-  const handleDelete = async (id) => {
+  }, [authFetch]);
+  const handleDelete = useCallback(async (id) => {
     if (!window.confirm("Delete this application?")) return;
 
     try {
@@ -81,7 +81,7 @@ function ApplicationTable({ authFetch }) {
     } catch {
       alert("Something went wrong reaching the server.");
     }
-  };
+  }, [authFetch]);
   const openAddModal = () => {
     setEditingRow(null);
     setIsModalOpen(true);
@@ -195,7 +195,7 @@ function ApplicationTable({ authFetch }) {
         },
       },
     ],
-    []
+    [handleStatusChange, handleDelete]
   );
   // tanstack's hook trips the react compiler lint rule, known issue and fine for how we use it
   // eslint-disable-next-line react-hooks/incompatible-library
