@@ -9,6 +9,7 @@ import {
 import { ArrowUpDown, Plus, Trash2 } from "lucide-react";
 import Modal from "./Modal";
 import ApplicationForm from "./ApplicationForm";
+import SummaryCards from "./SummaryCards";
 
 function ApplicationTable({ authFetch }) {
   const [data, setData] = useState([]);
@@ -216,6 +217,7 @@ function ApplicationTable({ authFetch }) {
 
   return (
     <div className="p-6">
+      <SummaryCards applications={data} />
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"

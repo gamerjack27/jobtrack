@@ -145,4 +145,17 @@ describe("ApplicationTable", () => {
     expect(screen.getByText("Acme")).toBeInTheDocument();
     expect(callsWith(api, "DELETE")).toHaveLength(0);
   });
+    it("updates the summary totals when a status changes", async () => {
+    const user = userEvent.setup();
+    render(<ApplicationTable authFetch={makeFakeApi()} />);
+    await screen.findByText("Acme");
+    const summary = within(screen.getByRole("region", { name: "Summary" }));
+    expect(summary.getByText("Interviewing").nextElementSibling).toHaveTextContent(/^0$/);
+
+    await user.selectOptions(screen.getAllByRole("combobox")[0], "INTERVIEWING");
+
+    await waitFor(() =>
+      expect(summary.getByText("Interviewing").nextElementSibling).toHaveTextContent(/^1$/)
+    );
+  });
 });
