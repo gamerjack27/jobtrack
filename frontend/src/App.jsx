@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import ApplicationTable from "./components/ApplicationTable";
 import LoginForm from "./components/LoginForm";
 import RegisterForm from "./components/RegisterForm";
 
 function App() {
-  // "login" | "register" | "app" - simple manual routing until we add React Router
-  const [view, setView] = useState("login");
-  const [user, setUser] = useState(null);
-  const [tokens, setTokens] = useState(null);
+  // read any saved session once, on first load (null if nothing saved or it's corrupted)
+const saved = (() => {
+  try {
+    return JSON.parse(localStorage.getItem("jobtrack_session"));
+  } catch {
+    return null;
+  }
+})();
+
+const [view, setView] = useState(saved ? "app" : "login");
+const [user, setUser] = useState(saved?.user ?? null);
+const [tokens, setTokens] = useState(saved?.tokens ?? null);
+// always holds the newest tokens, so authFetch never reads stale ones
+const tokensRef = useRef(saved?.tokens ?? null);
+// if a refresh is already running, other requests wait on it instead of starting another
+const refreshPromise = useRef(null);
+
+// one place that updates state AND saves it, so login/register can't drift apart
+const startSession = (user, tokens) => {
+  setUser(user);
+  setTokens(tokens);
+  setView("app");
+  localStorage.setItem("jobtrack_session", JSON.stringify({ user, tokens }));
+  tokensRef.current = tokens;
+};
 
   const handleLogin = async (formData) => {
   const res = await fetch("/api/auth/login", {
@@ -20,17 +41,57 @@ function App() {
   // fetch doesn't throw on a 400, so check it ourselves
   if (!res.ok) throw new Error(data.error.message);
 
-  setUser(data.user);
-  setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
-  setView("app");
+  startSession(data.user, { accessToken: data.accessToken, refreshToken: data.refreshToken });
 };
-  // no async or params needed, just clears the session and goes back to login
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
+  localStorage.removeItem("jobtrack_session");
+  tokensRef.current = null;
   setUser(null);
   setTokens(null);
   setView("login");
-};
+}, []);
 
+const authFetch = useCallback(async (url, options = {}) => {
+  const send = () =>
+    fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${tokensRef.current.accessToken}`,
+      },
+    });
+
+  const res = await send();
+  if (res.status !== 401) return res;
+
+  // probably an expired access token - get a new pair, but only one refresh at a time
+  if (!refreshPromise.current) {
+    refreshPromise.current = fetch("/api/auth/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: tokensRef.current.refreshToken }),
+    })
+      .then(async (r) => {
+        if (!r.ok) throw new Error("refresh failed");
+        const newTokens = await r.json();
+        tokensRef.current = newTokens;
+        setTokens(newTokens);
+        const session = JSON.parse(localStorage.getItem("jobtrack_session"));
+        localStorage.setItem("jobtrack_session", JSON.stringify({ ...session, tokens: newTokens }));
+      })
+      .finally(() => {
+        refreshPromise.current = null;
+      });
+  }
+
+  try {
+    await refreshPromise.current;
+  } catch {
+    handleLogout(); // refresh token is dead too, so back to the login screen
+    return res;
+  }
+  return send(); // retry the original request with the new token
+}, [handleLogout]);
 
   const handleRegister = async (formData) => {
   const res = await fetch("/api/auth/register", {
@@ -80,7 +141,7 @@ function App() {
         </button>
       </div>
     </div>
-    <ApplicationTable accessToken={tokens.accessToken} />
+    <ApplicationTable authFetch={authFetch} />
   </div>
 );
 }
