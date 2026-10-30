@@ -99,8 +99,7 @@ const authFetch = useCallback(async (url, options = {}) => {
   // fetch doesn't throw on a 400, so check it ourselves
   if (!res.ok) throw new Error(data.error.message);
 
-  setUser(data.user);
-  setView("app");
+  startSession(data.user, { accessToken: data.accessToken, refreshToken: data.refreshToken });
 };
 
   if (view === "login") {
