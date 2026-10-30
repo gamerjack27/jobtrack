@@ -15,8 +15,6 @@ const saved = (() => {
 
 const [view, setView] = useState(saved ? "app" : "login");
 const [user, setUser] = useState(saved?.user ?? null);
-const [tokens, setTokens] = useState(saved?.tokens ?? null);
-// always holds the newest tokens, so authFetch never reads stale ones
 const tokensRef = useRef(saved?.tokens ?? null);
 // if a refresh is already running, other requests wait on it instead of starting another
 const refreshPromise = useRef(null);
@@ -24,7 +22,6 @@ const refreshPromise = useRef(null);
 // one place that updates state AND saves it, so login/register can't drift apart
 const startSession = (user, tokens) => {
   setUser(user);
-  setTokens(tokens);
   setView("app");
   localStorage.setItem("jobtrack_session", JSON.stringify({ user, tokens }));
   tokensRef.current = tokens;
@@ -47,7 +44,6 @@ const startSession = (user, tokens) => {
   localStorage.removeItem("jobtrack_session");
   tokensRef.current = null;
   setUser(null);
-  setTokens(null);
   setView("login");
 }, []);
 
@@ -75,7 +71,6 @@ const authFetch = useCallback(async (url, options = {}) => {
         if (!r.ok) throw new Error("refresh failed");
         const newTokens = await r.json();
         tokensRef.current = newTokens;
-        setTokens(newTokens);
         const session = JSON.parse(localStorage.getItem("jobtrack_session"));
         localStorage.setItem("jobtrack_session", JSON.stringify({ ...session, tokens: newTokens }));
       })
@@ -105,7 +100,6 @@ const authFetch = useCallback(async (url, options = {}) => {
   if (!res.ok) throw new Error(data.error.message);
 
   setUser(data.user);
-  setTokens({ accessToken: data.accessToken, refreshToken: data.refreshToken });
   setView("app");
 };
 
