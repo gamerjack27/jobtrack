@@ -10,7 +10,7 @@ import { ArrowUpDown, Plus, Trash2 } from "lucide-react";
 import Modal from "./Modal";
 import ApplicationForm from "./ApplicationForm";
 
-function ApplicationTable({ accessToken }) {
+function ApplicationTable({ authFetch }) {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState([true]);
   const [sorting, setSorting] = useState([]);
@@ -21,8 +21,7 @@ function ApplicationTable({ accessToken }) {
   const [editingRow, setEditingRow] = useState(null);
   useEffect(() => {
   const fetchApplications = async () => {
-    const res = await fetch("/api/applications", {
-      headers: { Authorization: `Bearer ${accessToken}` },
+    const res = await authFetch("/api/applications", {
     });
     const result = await res.json();
 
@@ -37,15 +36,14 @@ function ApplicationTable({ accessToken }) {
   };
 
   fetchApplications();
-}, [accessToken]);
+}, [authFetch]);
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const res = await fetch(`/api/applications/${id}`, {
+      const res = await authFetch(`/api/applications/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -67,9 +65,8 @@ function ApplicationTable({ accessToken }) {
     if (!window.confirm("Delete this application?")) return;
 
     try {
-      const res = await fetch(`/api/applications/${id}`, {
+      const res = await authFetch(`/api/applications/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       if (!res.ok) {
@@ -106,11 +103,10 @@ function ApplicationTable({ accessToken }) {
     const method = isEditing ? "PATCH" : "POST";
 
     try {
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(formData),
       });
