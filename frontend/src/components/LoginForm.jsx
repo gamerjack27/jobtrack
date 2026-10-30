@@ -40,8 +40,9 @@ function LoginForm({ onSubmit, onSwitchToRegister }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
+              id = "email"
               type="email"
               name="email"
               value={formData.email}
@@ -51,8 +52,9 @@ function LoginForm({ onSubmit, onSwitchToRegister }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <input
+              id = "password"
               type="password"
               name="password"
               value={formData.password}
