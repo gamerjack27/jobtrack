@@ -59,7 +59,7 @@ function ApplicationTable({ accessToken }) {
       setData((prevData) =>
         prevData.map((app) => (app.id === id ? updated : app))
       );
-    } catch (err) {
+    } catch {
       alert("Something went wrong reaching the server.");
     }
   };
@@ -81,7 +81,7 @@ function ApplicationTable({ accessToken }) {
       // his DELETE returns 204 No Content on success - no body to parse,
       // so we just remove it locally instead of reading a response
       setData((prevData) => prevData.filter((app) => app.id !== id));
-    } catch (err) {
+    } catch {
       alert("Something went wrong reaching the server.");
     }
   };
@@ -128,7 +128,7 @@ function ApplicationTable({ accessToken }) {
       } else {
         setData((prevData) => [...prevData, result]);
       }
-    }  catch (err) {
+    } catch {
       alert("Something went wrong reaching the server.");
       return;
     }
@@ -201,7 +201,8 @@ function ApplicationTable({ accessToken }) {
     ],
     []
   );
-
+  // tanstack's hook trips the react compiler lint rule, known issue and fine for how we use it
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

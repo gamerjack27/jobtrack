@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 
 const emptyForm = {
   company: "",
@@ -10,24 +10,18 @@ const emptyForm = {
 };
 
 function ApplicationForm({ initialData, onSubmit, onCancel }) {
-  const [formData, setFormData] = useState(emptyForm);
-
-  // if we're editing an existing row, pre-fill the form with its data
-  useEffect(() => {
-    if (initialData) {
-      setFormData({
+  const [formData, setFormData] = useState(() =>
+  initialData
+    ? {
         company: initialData.company || "",
         jobTitle: initialData.jobTitle || "",
         status: initialData.status || "WISHLIST",
-        // the date input needs YYYY-MM-DD, but the server sends a full timestamp
         appliedDate: initialData.appliedDate ? initialData.appliedDate.slice(0, 10) : "",
         salary: initialData.salary || "",
         location: initialData.location || "",
-      });
-    } else {
-      setFormData(emptyForm);
-    }
-  }, [initialData]);
+      }
+    : emptyForm
+);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
