@@ -60,8 +60,9 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
         
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Display Name</label>
+            <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">Display Name</label>
             <input
+              id = "displayName"
               type="text"
               name="displayName"
               value={formData.displayName}
@@ -70,8 +71,9 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
             />
         </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
+              id = "email"
               type="email"
               name="email"
               value={formData.email}
@@ -81,8 +83,9 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <input
+              id = "password"
               type="password"
               name="password"
               value={formData.password}
@@ -92,8 +95,9 @@ function RegisterForm({ onSubmit, onSwitchToLogin }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
             <input
+              id = "confirmPassword"
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
