@@ -42,8 +42,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Company</label>
+        <label htmlFor="company" className="block text-sm font-medium text-gray-700">Company</label>
         <input
+          id = "company"
           name="company"
           value={formData.company}
           onChange={handleChange}
@@ -53,8 +54,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Role</label>
+        <label htmlFor="role" className="block text-sm font-medium text-gray-700">Role</label>
         <input
+          id = "role"
           name="jobTitle"
           value={formData.jobTitle}
           onChange={handleChange}
@@ -64,8 +66,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Status</label>
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
         <select
+          id = "status"
           name="status"
           value={formData.status}
           onChange={handleChange}
@@ -80,8 +83,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Applied Date</label>
+        <label htmlFor="appliedDate" className="block text-sm font-medium text-gray-700">Applied Date</label>
         <input
+          id = "appliedDate"
           type="date"
           name="appliedDate"
           value={formData.appliedDate}
@@ -92,8 +96,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Salary</label>
+        <label htmlFor="salary" className="block text-sm font-medium text-gray-700">Salary</label>
         <input
+          id = "salary"
           type="number"
           name="salary"
           value={formData.salary}
@@ -103,8 +108,9 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Location</label>
+        <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
         <input
+          id = "location"
           name="location"
           value={formData.location}
           onChange={handleChange}
