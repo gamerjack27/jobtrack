@@ -113,9 +113,9 @@ describe("ApplicationTable", () => {
     render(<ApplicationTable authFetch={api} />);
     await screen.findByText("Acme");
 
-    await user.selectOptions(screen.getAllByRole("combobox")[0], "INTERVIEWING");
+    await user.selectOptions(screen.getAllByRole("combobox")[1], "INTERVIEWING");
 
-    await waitFor(() => expect(screen.getAllByRole("combobox")[0]).toHaveValue("INTERVIEWING"));
+    await waitFor(() => expect(screen.getAllByRole("combobox")[1]).toHaveValue("INTERVIEWING"));
     expect(callsWith(api, "PATCH")[0][0]).toBe("/api/applications/1");
     expect(JSON.parse(callsWith(api, "PATCH")[0][1].body)).toEqual({ status: "INTERVIEWING" });
   });
@@ -152,10 +152,47 @@ describe("ApplicationTable", () => {
     const summary = within(screen.getByRole("region", { name: "Summary" }));
     expect(summary.getByText("Interviewing").nextElementSibling).toHaveTextContent(/^0$/);
 
-    await user.selectOptions(screen.getAllByRole("combobox")[0], "INTERVIEWING");
+    await user.selectOptions(screen.getAllByRole("combobox")[1], "INTERVIEWING");
 
     await waitFor(() =>
       expect(summary.getByText("Interviewing").nextElementSibling).toHaveTextContent(/^1$/)
     );
+  });
+    it("filters the rows by status from the dropdown", async () => {
+    const user = userEvent.setup();
+    render(<ApplicationTable authFetch={makeFakeApi()} />);
+    await screen.findByText("Acme");
+
+    await user.selectOptions(screen.getByLabelText("Filter by status"), "WISHLIST");
+
+    expect(screen.queryByText("Acme")).not.toBeInTheDocument();
+    expect(screen.getByText("Globex")).toBeInTheDocument();
+  });
+
+  it("combines the status filter with the search box", async () => {
+    const user = userEvent.setup();
+    render(<ApplicationTable authFetch={makeFakeApi()} />);
+    await screen.findByText("Acme");
+
+    // Globex is WISHLIST, so searching for Acme with that filter leaves nothing
+    await user.selectOptions(screen.getByLabelText("Filter by status"), "WISHLIST");
+    await user.type(screen.getByPlaceholderText("Search applications..."), "Acme");
+
+    expect(screen.queryByText("Acme")).not.toBeInTheDocument();
+    expect(screen.queryByText("Globex")).not.toBeInTheDocument();
+  });
+
+  it("shows every row again when 'All statuses' is chosen", async () => {
+    const user = userEvent.setup();
+    render(<ApplicationTable authFetch={makeFakeApi()} />);
+    await screen.findByText("Acme");
+    const filter = screen.getByLabelText("Filter by status");
+
+    await user.selectOptions(filter, "WISHLIST");
+    expect(screen.queryByText("Acme")).not.toBeInTheDocument();
+    await user.selectOptions(filter, "");
+
+    expect(screen.getByText("Acme")).toBeInTheDocument();
+    expect(screen.getByText("Globex")).toBeInTheDocument();
   });
 });

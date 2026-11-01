@@ -140,6 +140,7 @@ function ApplicationTable({ authFetch }) {
       {
         accessorKey: "status",
         header: "Status",
+        filterFn: "equalsString",
         cell: (info) => {
           const row = info.row.original;
           return (
@@ -211,6 +212,8 @@ function ApplicationTable({ authFetch }) {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
+  const statusFilter = table.getColumn("status")?.getFilterValue() ?? "";
+
   if (isLoading) {
     return <p className="p-6 text-gray-500">Loading applications...</p>;
   }
@@ -226,6 +229,19 @@ function ApplicationTable({ authFetch }) {
           placeholder="Search applications..."
           className="px-3 py-2 border border-gray-300 rounded-md text-sm w-64"
         />
+        <select
+          aria-label="Filter by status"
+          value={statusFilter}
+          onChange={(e) => table.getColumn("status")?.setFilterValue(e.target.value || undefined)}
+          className="px-3 py-2 border border-gray-300 rounded"
+        >
+          <option value="">All statuses</option>
+          <option value="WISHLIST">Wishlist</option>
+          <option value="APPLIED">Applied</option>
+          <option value="INTERVIEWING">Interviewing</option>
+          <option value="OFFER">Offer</option>
+          <option value="REJECTED">Rejected</option>
+          </select>
         <button
           onClick={openAddModal}
           className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
