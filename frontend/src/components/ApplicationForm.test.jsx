@@ -54,6 +54,7 @@ describe("ApplicationForm", () => {
       appliedDate: "2026-10-03T00:00:00.000Z",
       salary: "85000",
       location: "Remote",
+      notes: "",
     });
   });
 
@@ -77,5 +78,20 @@ describe("ApplicationForm", () => {
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+    it("includes the typed notes when submitting", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<ApplicationForm onSubmit={onSubmit} onCancel={() => {}} />);
+
+    await user.type(screen.getByLabelText("Company"), "Acme");
+    await user.type(screen.getByLabelText("Role"), "Developer");
+    fireEvent.change(screen.getByLabelText("Applied Date"), { target: { value: "2026-10-10" } });
+    await user.type(screen.getByLabelText("Notes"), "Referred by Sam");
+    await user.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ notes: "Referred by Sam" })
+    );
   });
 });

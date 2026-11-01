@@ -7,6 +7,7 @@ const emptyForm = {
   appliedDate: "",
   salary: "",
   location: "",
+  notes: "",
 };
 
 function ApplicationForm({ initialData, onSubmit, onCancel }) {
@@ -19,6 +20,7 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
         appliedDate: initialData.appliedDate ? initialData.appliedDate.slice(0, 10) : "",
         salary: initialData.salary || "",
         location: initialData.location || "",
+        notes: initialData.notes || "",
       }
     : emptyForm
 );
@@ -117,7 +119,17 @@ function ApplicationForm({ initialData, onSubmit, onCancel }) {
           className="mt-1 w-full border border-gray-300 rounded px-2 py-1 text-sm"
         />
       </div>
-
+            <div>
+        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">Notes</label>
+        <textarea
+          id="notes"
+          name="notes"
+          rows={3}
+          value={formData.notes}
+          onChange={handleChange}
+          className="mt-1 w-full border border-gray-300 rounded px-2 py-1 text-sm"
+        />
+      </div>
       <div className="flex justify-end gap-2 mt-2">
         <button
           type="button"
