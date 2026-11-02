@@ -57,7 +57,14 @@ Step C: API Workflow Verification
     Authentication: POST /api/auth/login validates credentials and issues fresh access token.
     CRUD Flow: POST /api/applications, GET /api/applications, PATCH /api/applications/:id, and DELETE /api/applications/:id execute cleanly for authenticated users.
 
-6. Scope & Testing Boundaries
-Cross-Viewport & Platform Testing Scope
-    Current Status: Deferred for future iterations.
-    Rationale: Milestone 2 engineering efforts were prioritized on foundational backend infrastructure, database security hardening, RBAC multi-tenant data isolation, input DTO boundaries, and achieving >94% automated test coverage. Cross-viewport and platform responsiveness testing is scheduled alongside frontend UI integration in a subsequent milestone.
+6. Cross-Platform Testing
+Ran the README verification steps (register, login, add/edit/delete, status dropdown, search/sort, summary totals, status filter, notes, refresh persistence) on each platform below.
+
+| Browser / Device | OS | Result | Issues |
+|---|---|---|---|
+| Chrome <version> | Windows 11 | Pass | None |
+| Firefox <version> | Ubuntu (VM) | Pass | None |
+| <browser> | <OS> | Pass | None |
+| Mobile viewport (Chrome DevTools, <device>) | — | Pass | None |
+
+Tested on 10/31/26.
