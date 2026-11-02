@@ -1,26 +1,24 @@
+import { jest } from "@jest/globals";
 import request from "supertest";
 import app from "../../src/app.js";
 import { prisma } from "../../src/db/client.js";
+import { ApplicationService } from "../../src/services/application.service.js";
+import {
+  resetDatabase,
+  createTestUser,
+  tokenFor,
+} from "../test-utils/fixtures.js";
 
 describe("Application Routes Integration Tests", () => {
+  let user;
   let accessToken;
 
   beforeEach(async () => {
-    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes("test")) {
-      throw new Error("Tests must be run against a test database! Check your DATABASE_URL.");
-    }
-    await prisma.application.deleteMany({});
-    await prisma.user.deleteMany({});
+    await resetDatabase();
 
-    // Register and login a user to get a valid token for requests
-    const userPayload = {
-      email: "apptest@example.com",
-      displayName: "App Tester",
-      password: "securepassword123"
-    };
-
-    const regRes = await request(app).post("/api/auth/register").send(userPayload);
-    accessToken = regRes.body.accessToken;
+    // Create a test user via fixtures and generate token
+    user = await createTestUser({ email: "apptest@example.com" });
+    accessToken = tokenFor(user);
   });
 
   afterAll(async () => {
@@ -36,7 +34,7 @@ describe("Application Routes Integration Tests", () => {
         jobTitle: "Software Engineer",
         status: "WISHLIST",
         location: "Remote",
-        salary: "$100,000"
+        salary: "$100,000",
       });
 
     expect(res.status).toBe(201);
@@ -50,7 +48,7 @@ describe("Application Routes Integration Tests", () => {
       .post("/api/applications")
       .send({
         company: "Acme Corp",
-        jobTitle: "Software Engineer"
+        jobTitle: "Software Engineer",
       });
 
     expect(res.status).toBe(401);
@@ -58,13 +56,13 @@ describe("Application Routes Integration Tests", () => {
   });
 
   it("should retrieve user applications", async () => {
-    // Create one first
+    // Create one first via route
     await request(app)
       .post("/api/applications")
       .set("Authorization", `Bearer ${accessToken}`)
       .send({
         company: "Tech Co",
-        jobTitle: "Backend Developer"
+        jobTitle: "Backend Developer",
       });
 
     const res = await request(app)
@@ -75,5 +73,46 @@ describe("Application Routes Integration Tests", () => {
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBe(1);
     expect(res.body[0].company).toBe("Tech Co");
+  });
+
+  it("should return 404 when trying to update a non-existent application", async () => {
+    const res = await request(app)
+      .patch("/api/applications/99999999-9999-9999-9999-999999999999")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ jobTitle: "Ghost Job" });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("should return 404 when trying to delete a non-existent application", async () => {
+    const res = await request(app)
+      .delete("/api/applications/99999999-9999-9999-9999-999999999999")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("should handle custom NotFoundError in application routes", async () => {
+    const res = await request(app)
+      .patch("/api/applications/00000000-0000-0000-0000-000000000000")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ jobTitle: "Nonexistent" });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe("NOT_FOUND");
+  });
+
+  it("should handle unexpected service errors via next(err)", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    jest.spyOn(ApplicationService, "getUserApplications").mockRejectedValue(new Error("Unexpected DB crash"));
+  
+    const res = await request(app)
+      .get("/api/applications")
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(500);
+
+    ApplicationService.getUserApplications.mockRestore();
+    consoleSpy.mockRestore();
   });
 });
