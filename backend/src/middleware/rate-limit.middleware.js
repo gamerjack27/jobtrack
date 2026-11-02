@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 export const authRateLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 5, // Limit each IP to 5 login requests per windowMs
+  skipSuccessfulRequests: true, // Only count failed requests towards the limit
   message: {
     error: {
       code: "TOO_MANY_ATTEMPTS",

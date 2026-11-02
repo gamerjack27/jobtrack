@@ -14,15 +14,21 @@
 
 | Component | Threat | Category | Likelihood | Impact | Risk Rating | Mitigation |
 |-----------|--------|----------|------------|--------|-------------|------------|
-| PATCH /api/applications/:id | A malicious user manipulates `userId` or injects unauthorized fields via mass-assignment to hijack or alter protected columns | Tampering / Elevation of Privilege | High | High | Critical | Structural input DTO (`toApplicationUpdateDTO`) using an explicit allowlist (`company`, `jobTitle`, `status`, `appliedDate`, `salary`, `location`, `notes`) to strip unsafe fields |
-| PATCH /api/applications/:id & DELETE /api/applications/:id | User B attempts to update or delete User A's application by guessing or enumerating application IDs (Insecure Direct Object Reference) | Broken Access Control / Info Disclosure | High | High | Critical | Explicit ownership validation checking `existing.userId !== userId` throwing `403 Forbidden` prior to modification |
-| POST /api/auth/login | Attackers perform automated credential-stuffing or brute-force attacks against user accounts | Denial of Service / Broken Auth | Medium | High | High | Rate-limiting middleware (`express-rate-limit`) restricting high-frequency requests |
+| PATCH /api/applications/:id | A malicious user manipulates `userId` or injects unauthorized fields via mass-assignment to hijack or alter protected columns | Tampering / Elevation of Privilege | High | High | Critical | Structural input DTO (`toApplicationUpdateDTO`) using an explicit allowlist to strip unsafe fields |
+| PATCH /api/applications/:id & DELETE /api/applications/:id | User B attempts to update or delete User A's application by guessing or enumerating application IDs (Insecure Direct Object Reference) | Broken Access Control / Info Disclosure | High | High | Critical | Backend ownership validation checking `existing.userId !== userId` throwing `403 Forbidden` prior to modification (verified via test coverage) |
+| POST /api/auth/login | Attackers perform automated credential-stuffing or brute-force attacks against user accounts | Denial of Service / Broken Auth | Medium | High | High | Rate-limiting middleware (`express-rate-limit`) with `skipSuccessfulRequests: true` |
 | Global API error handling | Uncaught database errors or internal exceptions reveal stack traces and database schema connection details to clients | Information Disclosure | High | Medium | High | Centralized `errorHandler` middleware that sanitizes response payloads and logs errors internally in production |
+
+### Known Security Gaps & Scope Limitations
+- **Token Storage:** Access and refresh tokens are stored in browser `localStorage` rather than HTTP-only cookies (exposing them to potential XSS vectors).
+- **Token Lifetime:** Access tokens are configured for a 15-minute expiration window to balance usability and security.
+- **Transport Security:** Local development environment does not enforce HTTPS (`no HTTPS locally`).
+- **Audit & Logging:** Dependency vulnerability management relies on dev-only audit advisories, and runtime logging relies strictly on standard error console streams (`console-only logging`).
 
 ### Hardening Log
 - 2026 — Milestone 2: Implemented structural input DTO filtering (`toApplicationUpdateDTO`) with an explicit allowlist to prevent mass-assignment injection
-- 2026 — Milestone 2: Enforced strict multi-tenant ownership checks returning `403 Forbidden` for cross-user resource access
-- 2026 — Milestone 2: Added `express-rate-limit` protection to authentication endpoints
+- 2026 — Milestone 2: Enforced strict multi-tenant ownership checks returning `403 Forbidden` for cross-user resource access (covered by integration tests)
+- 2026 — Milestone 2: Added `express-rate-limit` protection with `skipSuccessfulRequests: true` to authentication endpoints
 - 2026 — Milestone 2: Configured centralized production error-handling middleware to prevent stack trace leaks
 - 2026 — Milestone 2: Added automated security integration test suite covering RBAC, mass-assignment protection, and unauthorized modifications
 
