@@ -1,24 +1,18 @@
 import express from "express";
+import helmet from "helmet";
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
+import { errorHandler } from "./middleware/error-handler.js";
 
 const app = express();
 
+app.use(helmet());
 app.use(express.json());
 app.use("/api", healthRoutes);
 app.use("/api", authRoutes);
 app.use("/api", applicationRoutes);
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(err.status || 500).json({
-    error: {
-      code: err.code || "INTERNAL_ERROR",
-      message: err.message || "An unexpected error occurred."
-    }
-  });
-});
+app.use(errorHandler);
 
 export default app;
