@@ -1,5 +1,6 @@
 import { ApplicationRepository } from "../repositories/application.repository.js";
 import { assertNonEmpty } from "../utils/validation.js";
+import { toApplicationUpdateDTO } from "../dto/application.dto.js";
 
 export class NotFoundError extends Error {}
 export class ForbiddenError extends Error {}
@@ -20,7 +21,8 @@ export const ApplicationService = {
     if (!existing) throw new NotFoundError("Application not found.");
     if (existing.userId !== userId) throw new ForbiddenError("Access denied.");
 
-    return ApplicationRepository.update(applicationId, updates);
+    const sanitizedData = toApplicationUpdateDTO(updates);
+    return ApplicationRepository.update(applicationId, sanitizedData);
   },
 
   async deleteApplication(userId, applicationId) {

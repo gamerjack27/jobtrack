@@ -10,15 +10,13 @@ export const ApplicationRepository = {
   findAllByUser(userId) {
     return prisma.application.findMany({
       where: { userId },
-      include: { contacts: true},
       orderBy: { updatedAt: "desc" }
     });
   },
 
   findById(id) {
     return prisma.application.findUnique({
-      where: { id },
-      include: { contacts: true}
+      where: { id }
     });
   },
 
