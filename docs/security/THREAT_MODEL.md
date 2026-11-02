@@ -27,7 +27,7 @@
 
 ### Hardening Log
 - 2026 — Milestone 2: Implemented structural input DTO filtering (`toApplicationUpdateDTO`) with an explicit allowlist to prevent mass-assignment injection
-- 2026 — Milestone 2: Enforced strict multi-tenant ownership checks returning `403 Forbidden` for cross-user resource access (covered by integration tests)
+- 2026 — Milestone 2: Covered existing (Milestone 1) multi-tenant ownership checks with integration tests returning `403 Forbidden` for cross-user resource access
 - 2026 — Milestone 2: Added `express-rate-limit` protection with `skipSuccessfulRequests: true` to authentication endpoints
 - 2026 — Milestone 2: Configured centralized production error-handling middleware to prevent stack trace leaks
 - 2026 — Milestone 2: Added automated security integration test suite covering RBAC, mass-assignment protection, and unauthorized modifications
