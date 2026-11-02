@@ -125,6 +125,9 @@ Use this checklist to confirm everything works end to end.
 7. Change an entry's status using its dropdown, then refresh the page and confirm it stuck.
 8. Click the trash icon on a row and confirm the delete. The row should disappear and stay gone after a refresh.
 9. Use the search bar to filter by company name, and click a column header to sort.
+10. Check the summary totals at the top of the page. Add an application or change a status, and the Applied / Interviewing / Offers counts should update.
+11. Use the status filter dropdown to pick a status. Only applications with that status should show in the table.
+12. Open an application, type something in the Notes field, and save. Reopen it and the note should still be there.
 
 ## Team
 
