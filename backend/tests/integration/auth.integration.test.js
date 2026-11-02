@@ -4,7 +4,9 @@ import { prisma } from "../../src/db/client.js";
 
 describe("Auth Integration Tests", () => {
   beforeEach(async () => {
-    // Clean up users table before each test to ensure a clean state
+    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes("test")) {
+      throw new Error("Tests must be run against a test database! Check your DATABASE_URL.");
+    }
     await prisma.user.deleteMany({});
   });
 

@@ -6,6 +6,9 @@ describe("Application Routes Integration Tests", () => {
   let accessToken;
 
   beforeEach(async () => {
+    if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.includes("test")) {
+      throw new Error("Tests must be run against a test database! Check your DATABASE_URL.");
+    }
     await prisma.application.deleteMany({});
     await prisma.user.deleteMany({});
 
