@@ -1,9 +1,5 @@
 import request from "supertest";
-import express from "express";
-import healthRoutes from "../src/routes/health.routes.js";
-
-const app = express();
-app.use("/api", healthRoutes);
+import app from "../src/app.js";
 
 describe("Health Check Endpoint", () => {
   it("should return status ok and service name", async () => {
