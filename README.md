@@ -67,6 +67,24 @@ npm run dev
 
 You should see `JobTrack API listening on port 5000`.
 
+### Running Tests (Backend)
+1. Copy .env.test.example to .env.test:
+    cp .env.test.example .env.test
+
+2. Create the test database in PostgreSQL:
+    psql -U postgres -c "CREATE DATABASE jobtrack_test;"
+
+3. Run Prisma migrations against the test database using the config file:
+    DATABASE_URL="postgresql://<user>:<password>@localhost:5433/jobtrack_test" npx prisma migrate deploy --config prisma7.config.ts
+
+    Make sure the <user> and <password> match the ones in .env file
+
+4. Run the test suite:
+    npm test
+
+5. Run the coverage report:
+    npm run test:coverage
+
 ### 3. Frontend setup
 
 In a separate terminal:
