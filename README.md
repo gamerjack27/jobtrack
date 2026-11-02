@@ -128,6 +128,7 @@ Use this checklist to confirm everything works end to end.
 10. Check the summary totals at the top of the page. Add an application or change a status, and the Applied / Interviewing / Offers counts should update.
 11. Use the status filter dropdown to pick a status. Only applications with that status should show in the table.
 12. Open an application, type something in the Notes field, and save. Reopen it and the note should still be there.
+13. Refresh the page. You should still be logged in and see your applications.
 
 ## Team
 
