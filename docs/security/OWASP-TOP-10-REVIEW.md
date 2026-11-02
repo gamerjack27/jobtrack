@@ -2,7 +2,7 @@
 
 | # | Category | Status in JobTrack | Action |
 |---|----------|--------------------|--------|
-| A01 | Broken Access Control | Found: application patch/delete routes initially lacked explicit multi-tenant ownership verification against `req.user.sub` | Fixed — Enforced backend ownership validation throwing `403 Forbidden`; covered by integration tests |
+| A01 | Broken Access Control | Multi-tenant ownership checks in `application.service.js` (existing since Milestone 1) prevent cross-tenant update/delete | Verified — now covered by integration regression tests returning `403 Forbidden` |
 | A02 | Cryptographic Failures | Passwords securely hashed with `bcrypt` (cost factor 10 / test factor 4); JWT tokens signed with dedicated secrets. **Known gaps:** access tokens expire after 15m and are stored in client-side `localStorage`; no local HTTPS enforcement for MVP | Verified, secure; known gaps documented |
 | A03 | Injection | Prisma ORM parameterized queries used universally across repositories, preventing SQL injection by design | Verified, no action needed |
 | A04 | Insecure Design | Addressed via threat modeling, DTO input boundaries, and explicit multi-tenant separation | Verified, no action needed |

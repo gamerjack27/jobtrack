@@ -62,9 +62,9 @@ Ran the README verification steps (register, login, add/edit/delete, status drop
 
 | Browser / Device | OS | Result | Issues |
 |---|---|---|---|
-| Chrome <version> | Windows 11 | Pass | None |
-| Firefox <version> | Ubuntu (VM) | Pass | None |
-| <browser> | <OS> | Pass | None |
-| Mobile viewport (Chrome DevTools, <device>) | — | Pass | None |
+| Chrome  | Windows 11 | Pass | None |
+| Firefox | Ubuntu (VM) | Pass | None |
+| Edge | Windows 11 | Pass | None |
+| Safari on iPhone 15 | iOS | Pass | None |
 
 Tested on 10/31/26.
