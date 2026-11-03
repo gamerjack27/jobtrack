@@ -239,7 +239,7 @@ function ApplicationTable({ authFetch }) {
           <option value="WISHLIST">Wishlist</option>
           <option value="APPLIED">Applied</option>
           <option value="INTERVIEWING">Interviewing</option>
-          <option value="OFFER">Offer</option>
+          <option value="OFFERED">Offer</option>
           <option value="REJECTED">Rejected</option>
           </select>
         <button
