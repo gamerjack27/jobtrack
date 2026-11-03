@@ -38,16 +38,16 @@ Coverage Breakdown
 |-------------|--------------------|-------------------------|
 | Mass-Assignment Mitigation | Structural allowlist filtering via toApplicationUpdateDTO in PATCH /api/applications/:id | security.integration.test.js verifies that extra payload fields (such as userId) are ignored. | 
 | Multi-Tenant Authorization | Database ownership checks enforcing 403 Forbidden if application.userId !== req.user.sub | Integration test asserts User B cannot update or delete User A's job application records. |
-| Brute-Force Rate Limiting | express-rate-limit middleware (authRateLimiter) on POST /api/auth/login | Automated test verifies IP request throttling after limit exceeded. | 
+| Brute-Force Rate Limiting | express-rate-limit middleware (authRateLimiter) on POST /api/auth/login | Verified manually: six wrong logins in a row return 429 and the login form shows "Too many login attempts". | 
 | Production Error Masking | Centralized errorHandler middleware stripping stack traces in production | Unit tests in error-handler.test.js verify sanitized output during non-development environments. |
-| Security Headers | helmet middleware added in app.js | HTTP response header inspection during integration suite runs. |
+| Security Headers | helmet middleware added in app.js | Verified manually by inspecting response headers in the browser Network tab (helmet adds headers such as X-Content-Type-Options and removes X-Powered-By). |
 
 5. Manual QA & TA Verification Checklist
 Use this checklist to manually verify local deployment readiness before merging release tags:
 Step A: Infrastructure Setup
-    Docker container running PostgreSQL on port 5433.
-    backend/.env populated matching backend/.env.example.
-    npx prisma migrate dev applied cleanly without schema errors.
+    Backend set up following the README (local PostgreSQL for the dev database, Docker PostgreSQL on port 5433 for the test database).
+    backend/.env and backend/.env.test created from the .example files.
+    npx prisma migrate deploy applied cleanly without schema errors.
 Step B: Execution of Automated Test Suite
     Run npm run test — all test suites pass without unhandled rejections.
     Run npm run test:coverage — total statement coverage meets or exceeds 85%.
@@ -68,3 +68,5 @@ Ran the README verification steps (register, login, add/edit/delete, status drop
 | Safari on iPhone 15 | iOS | Pass | None |
 
 Tested on 10/31/26.
+
+Known limitation: the layout is optimized for desktop and laptop widths. The applications table is not optimized for phone-width screens (planned for Milestone 3).

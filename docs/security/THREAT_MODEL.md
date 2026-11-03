@@ -33,6 +33,6 @@
 - 2026 — Milestone 2: Added automated security integration test suite covering RBAC, mass-assignment protection, and unauthorized modifications
 
 ### Security Measurement Baseline
-- Vulnerabilities found this pass: 3 (all remediated)
+- Vulnerabilities found this pass: 4, all remediated (mass assignment on PATCH, no rate limit on login, raw error messages returned to clients, missing security headers). The cross-tenant ownership check already existed and is now covered by integration tests.
 - Security test coverage: Dedicated integration test suite (`security.integration.test.js`) verifying multi-tenant data isolation and mass-assignment prevention
 - Maturity note: JobTrack's security practice establishes baseline backend defense-in-depth controls (DTO validation, rate limiting, and RBAC guards) for the MVP architecture.
