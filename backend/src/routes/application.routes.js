@@ -10,6 +10,7 @@ router.post("/applications", async (req, res, next) => {
     const app = await ApplicationService.createApplication(req.user.sub, req.body);
     res.status(201).json(app);
   } catch (err) {
+    if (err instanceof ForbiddenError) return res.status(403).json({ error: { code: "FORBIDDEN", message: err.message } });
     next(err);
   }
 });
