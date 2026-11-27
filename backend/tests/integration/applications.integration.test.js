@@ -41,6 +41,7 @@ describe("Application Routes Integration Tests", () => {
     expect(res.body).toHaveProperty("id");
     expect(res.body.company).toBe("Acme Corp");
     expect(res.body.jobTitle).toBe("Software Engineer");
+    expect(res.body.userId).toBe(user.id);
   });
 
   it("should reject application creation without authentication", async () => {
@@ -114,5 +115,72 @@ describe("Application Routes Integration Tests", () => {
 
     ApplicationService.getUserApplications.mockRestore();
     consoleSpy.mockRestore();
+  });
+
+  it("should reject creating an application under another user's ID", async () => {
+    const otherUser = await createTestUser({ email: "other@example.com" });
+
+    const res = await request(app)
+      .post("/api/applications")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        company: "Stripe",
+        jobTitle: "Software Engineer Intern",
+        userId: otherUser.id,
+      });
+
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("FORBIDDEN");
+
+    const otherUserApps = await prisma.application.findMany({
+      where: { userId: otherUser.id },
+    });
+    expect(otherUserApps).toHaveLength(0);
+  });
+
+  it("should allow creating an application when userId matches authenticated user", async () => {
+    const res = await request(app)
+      .post("/api/applications")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        company: "Linear",
+        jobTitle: "Product Engineer",
+        userId: user.id,
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.userId).toBe(user.id);
+  });
+
+  it("should not allow accessing, updating, or deleting another user's application", async () => {
+    const otherUser = await createTestUser({ email: "owner@example.com" });
+    const otherToken = tokenFor(otherUser);
+
+    const created = await request(app)
+      .post("/api/applications")
+      .set("Authorization", `Bearer ${otherToken}`)
+      .send({
+        company: "Datadog",
+        jobTitle: "Site Reliability Intern",
+      });
+
+    const listRes = await request(app)
+      .get("/api/applications")
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(listRes.status).toBe(200);
+    expect(listRes.body).toHaveLength(0);
+
+    const patchRes = await request(app)
+      .patch(`/api/applications/${created.body.id}`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ jobTitle: "Hijacked Title" });
+    expect(patchRes.status).toBe(403);
+    expect(patchRes.body.error.code).toBe("FORBIDDEN");
+
+    const deleteRes = await request(app)
+      .delete(`/api/applications/${created.body.id}`)
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(deleteRes.status).toBe(403);
+    expect(deleteRes.body.error.code).toBe("FORBIDDEN");
   });
 });

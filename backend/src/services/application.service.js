@@ -9,7 +9,11 @@ export const ApplicationService = {
   createApplication(userId, data) {
     assertNonEmpty(data.company, "company");
     assertNonEmpty(data.jobTitle, "jobTitle");
-    return ApplicationRepository.create({ userId, ...data });
+    if (data.userId !== undefined && data.userId !== userId) {
+      throw new ForbiddenError("Access denied.");
+    }
+    const { userId: _ignoredUserId, ...safeData } = data;
+    return ApplicationRepository.create({ userId, ...safeData });
   },
 
   getUserApplications(userId) {
