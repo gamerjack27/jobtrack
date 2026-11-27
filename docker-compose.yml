@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: jobtrack
+      POSTGRES_PASSWORD: jobtrack
+      POSTGRES_DB: jobtrack_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - jobtrack_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jobtrack -d jobtrack_dev"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  server:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://jobtrack:jobtrack@db:5432/jobtrack_dev
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:?set ACCESS_TOKEN_SECRET in .env}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:?set REFRESH_TOKEN_SECRET in .env}
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  jobtrack_db_data:
