@@ -34,7 +34,7 @@ jobs:
         run: |
           IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/jobtrack-backend:${SHA}"
           echo "Deploying $IMAGE"
-          curl -fsS -X POST "${DEPLOY_HOOK}&imgURL=${IMAGE}"
+          curl -fsS -X POST -G "$DEPLOY_HOOK" --data-urlencode "imgURL=$IMAGE"
 
       - name: Wait for staging to respond
         run: |
