@@ -118,14 +118,3 @@ jobs:
           docker build -t "$IMAGE:${GITHUB_SHA}" -t "$IMAGE:latest" ./backend
           docker push "$IMAGE:${GITHUB_SHA}"
           docker push "$IMAGE:latest"
-      - name: Trigger Render deploys
-        env:
-          HOOK_STAGING: ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
-          HOOK_PRODUCTION: ${{ secrets.RENDER_DEPLOY_HOOK_PRODUCTION }}
-        run: |
-          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/jobtrack-backend:${GITHUB_SHA}"
-          for HOOK in "$HOOK_STAGING" "$HOOK_PRODUCTION"; do
-            if [ -n "$HOOK" ]; then
-              curl -fsS -X POST -G "$HOOK" --data-urlencode "imgURL=$IMAGE"
-            fi
-          done

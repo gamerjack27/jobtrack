@@ -1,0 +1,72 @@
+name: Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy-staging:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
+    runs-on: ubuntu-latest
+    #environment:
+    #  name: staging
+    #  url: ${{ vars.STAGING_URL }}
+    env:
+      APP_URL: ${{ vars.STAGING_URL }}
+      DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_STAGING }}
+      SHA: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Check out the load-test scripts
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Deploy the exact CI-tested image to Render
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/jobtrack-backend:${SHA}"
+          echo "Deploying $IMAGE"
+          curl -fsS -X POST -G "$DEPLOY_HOOK" --data-urlencode "imgURL=$IMAGE"
+
+      - name: Wait for staging to respond
+        run: |
+          for attempt in $(seq 1 40); do
+            if curl -fsS --max-time 30 "$APP_URL/api/health"; then
+              echo
+              echo "Staging answered on attempt $attempt"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::Staging did not answer within 10 minutes"
+          exit 1
+
+      - name: Run smoke tests against staging
+        run: |
+          curl -fsS --max-time 30 "$APP_URL/api/health"
+          echo
+          # Check an auth/API route so a non-existent route or broken middleware is caught
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$APP_URL/api/applications")
+          echo "GET /api/applications status: $STATUS"
+          if [ "$STATUS" = "404" ] || [ "$STATUS" = "500" ] || [ "$STATUS" = "000" ]; then
+            echo "::error::Unexpected status $STATUS from /api/applications"
+            exit 1
+          fi
+          echo "Smoke tests passed"
+
+      - name: Load test (informational)
+        continue-on-error: true
+        run: docker run --rm -e BASE_URL="$APP_URL" grafana/k6:latest run - < load-tests/health.k6.js
+
+      - name: Notify team of deployment result
+        if: always()
+        run: |
+          echo "Staging deployment of ${SHA}: ${{ job.status }}"
