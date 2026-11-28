@@ -52,11 +52,12 @@ sudo -u postgres psql -c "CREATE DATABASE jobtrack OWNER jobtrack;"
 
 Make sure the password matches what you put in `DATABASE_URL`.
 
-Run the migrations and generate the Prisma client:
+Run the migrations, generate the Prisma client, and seed the database:
 
 ```bash
 npx prisma migrate deploy
 npx prisma generate
+npx prisma db seed
 ```
 
 Start the backend:
@@ -110,7 +111,11 @@ Open the printed local URL (usually `http://localhost:5173`) in a browser.
 
 ### 4. Demo account
 
-There's no pre-seeded account. Register a new one through the app's Register screen with any email, a display name, and a password of at least 8 characters.
+There is a pre-seeded account with these details:
+    Display Name: Demo Account
+    Email: demo@example.com
+    Password: password123
+    Applications: 12 Total Applications (3 Bookmarked, 3 Applied, 2 Interviewing, 2 Offered, 2 Rejected)
 
 ## Verification Steps
 
