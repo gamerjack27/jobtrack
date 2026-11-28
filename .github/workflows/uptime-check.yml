@@ -1,0 +1,17 @@
+name: Staging Uptime Check
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping staging health endpoint
+        run: curl -fsS --max-time 120 --retry 2 --retry-delay 10 "$STAGING_URL/api/health"
+        env:
+          STAGING_URL: ${{ vars.STAGING_URL }}
